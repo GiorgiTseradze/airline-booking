@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FlightDestination } from "@/types/FlightDestination";
+import { useRouter, useSearchParams } from "next/navigation";
 import Bounded from "./Bounded";
 import DatePicker from "./ui/date-picker";
 import { Label } from "@/components/ui/label";
@@ -19,6 +20,9 @@ export interface AirlineFormProps {
 }
 
 export const AirlineForm = ({ destinations }: AirlineFormProps) => {
+	const router = useRouter();
+	const searchParams = useSearchParams();
+
 	const [tripType, setTripType] = useState("one-way");
 	const [origin, setOrigin] = useState<FlightDestination | null>(null);
 	const [destination, setDestination] = useState<FlightDestination | null>(
@@ -27,11 +31,43 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 	const [departureDate, setDepartureDate] = useState<Date | undefined>();
 	const [returnDate, setReturnDate] = useState<Date | undefined>();
 
-	const handleDatePickerAvailability = (weekday: number) => {
-		console.log("hi");
-		if (!destination) return false;
-		return !destination.availableWeekdays.includes(weekday);
+  const updateQuery = () => {
+		const queryParams = new URLSearchParams();
+		if (origin) queryParams.set("origin", origin.code);
+		if (destination) queryParams.set("destination", destination.code);
+		if (tripType) queryParams.set("type", tripType);
+		if (departureDate)
+			queryParams.set(
+				"departureDate",
+				departureDate.toISOString().split("T")[0]
+			);
+		if (returnDate)
+			queryParams.set("returnDate", returnDate.toISOString().split("T")[0]);
+
+		router.push(`?${queryParams.toString()}`);
 	};
+
+	useEffect(() => {
+		const originCode = searchParams.get("origin");
+		const destinationCode = searchParams.get("destination");
+		const type = searchParams.get("type") || "one-way";
+		const departure = searchParams.get("departureDate");
+		const returnD = searchParams.get("returnDate");
+
+		setTripType(type);
+		if (originCode)
+			setOrigin(destinations.find((d) => d.code === originCode) || null);
+		if (destinationCode)
+			setDestination(
+				destinations.find((d) => d.code === destinationCode) || null
+			);
+		if (departure) setDepartureDate(new Date(departure));
+		if (returnD) setReturnDate(new Date(returnD));
+	}, [searchParams, destinations]);
+
+	useEffect(() => {
+		updateQuery();
+	}, [origin, destination, tripType, departureDate, returnDate]);
 
 	return (
 		<Bounded>
