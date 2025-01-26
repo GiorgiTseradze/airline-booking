@@ -13,7 +13,7 @@ import {
 
 interface DatePickerProps {
 	selectedDate: Date | undefined;
-	onSelect: (date: Date) => void;
+	onChange: (date: Date) => void;
 	availableDays: number[];
 }
 
@@ -25,7 +25,7 @@ function getDisabledWeekdays(availableWeekdays: number[]) {
 
 export default function DatePicker({
 	selectedDate,
-	onSelect,
+	onChange,
 	availableDays = [],
 }: DatePickerProps) {
 	const disabledDays = { dayOfWeek: getDisabledWeekdays(availableDays) };
@@ -50,7 +50,7 @@ export default function DatePicker({
 				<Calendar
 					mode="single"
 					selected={selectedDate}
-					onSelect={(date) => date && onSelect(date)}
+					onSelect={(date) => date && onChange(date)}
 					disabled={disabledDays}
 					initialFocus
 				/>
