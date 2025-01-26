@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { FlightDestination } from "@/types/FlightDestination";
 import Bounded from "./Bounded";
 import DatePicker from "./ui/date-picker";
@@ -8,51 +11,107 @@ import {
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuLabel,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-// TODO: implement the airlineForm component
 
 export interface AirlineFormProps {
 	destinations: FlightDestination[];
 }
 
 export const AirlineForm = ({ destinations }: AirlineFormProps) => {
+	const [tripType, setTripType] = useState("one-way");
+	const [origin, setOrigin] = useState<FlightDestination | null>(null);
+	const [destination, setDestination] = useState<FlightDestination | null>(
+		null
+	);
+	const [departureDate, setDepartureDate] = useState<Date | undefined>();
+	const [returnDate, setReturnDate] = useState<Date | undefined>();
+
+	const handleDatePickerAvailability = (weekday: number) => {
+		console.log("hi");
+		if (!destination) return false;
+		return !destination.availableWeekdays.includes(weekday);
+	};
+
 	return (
 		<Bounded>
 			<div className="flex flex-col gap-10">
 				<h1 className="font-body font-bold text-xl text-center">
 					Welcome to the Digido Airlines!
 				</h1>
+
 				<div>
-					<DatePicker />
-				</div>
-				<div>
-					<RadioGroup defaultValue="option-one">
-						<div className="flex items-center space-x-2">
-							<RadioGroupItem value="option-one" id="option-one" />
-							<Label htmlFor="option-one">Option One</Label>
-						</div>
-						<div className="flex items-center space-x-2">
-							<RadioGroupItem value="option-two" id="option-two" />
-							<Label htmlFor="option-two">Option Two</Label>
-						</div>
-					</RadioGroup>
-				</div>
-				<div>
+					<Label>Origin</Label>
 					<DropdownMenu>
-						<DropdownMenuTrigger>Open</DropdownMenuTrigger>
+						<DropdownMenuTrigger className="border px-4 py-2 rounded w-full text-left">
+							{origin ? origin.city : "Select Origin"}
+						</DropdownMenuTrigger>
 						<DropdownMenuContent>
-							<DropdownMenuLabel>My Account</DropdownMenuLabel>
-							<DropdownMenuSeparator />
-							<DropdownMenuItem>Profile</DropdownMenuItem>
-							<DropdownMenuItem>Billing</DropdownMenuItem>
-							<DropdownMenuItem>Team</DropdownMenuItem>
-							<DropdownMenuItem>Subscription</DropdownMenuItem>
+							{destinations.map((dest) => (
+								<DropdownMenuItem
+									key={dest.code}
+									onClick={() => setOrigin(dest)}
+								>
+									{dest.city} - {dest.airportName}
+								</DropdownMenuItem>
+							))}
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
+
+				<div>
+					<Label>Destination</Label>
+					<DropdownMenu>
+						<DropdownMenuTrigger className="border px-4 py-2 rounded w-full text-left">
+							{destination ? destination.city : "Select Destination"}
+						</DropdownMenuTrigger>
+						<DropdownMenuContent>
+							{destinations.map((dest) => (
+								<DropdownMenuItem
+									key={dest.code}
+									onClick={() => setDestination(dest)}
+								>
+									{dest.city} - {dest.airportName}
+								</DropdownMenuItem>
+							))}
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
+
+				<div>
+					<Label>Trip Type</Label>
+					<RadioGroup
+						value={tripType}
+						onValueChange={(value) => setTripType(value)}
+					>
+						<div className="flex items-center space-x-2">
+							<RadioGroupItem value="one-way" id="one-way" />
+							<Label htmlFor="one-way">One-Way</Label>
+						</div>
+						<div className="flex items-center space-x-2">
+							<RadioGroupItem value="round-trip" id="round-trip" />
+							<Label htmlFor="round-trip">Round-Trip</Label>
+						</div>
+					</RadioGroup>
+				</div>
+
+				<div>
+					<Label>Departure Date</Label>
+					<DatePicker
+						selectedDate={departureDate}
+						onSelect={(date) => setDepartureDate(date)}
+					/>
+				</div>
+				{tripType === "round-trip" && (
+					<div>
+						<Label>Return Date</Label>
+						<DatePicker
+							selectedDate={returnDate}
+							onSelect={(date) => setReturnDate(date)}
+							disabled={!departureDate}
+						/>
+					</div>
+				)}
 			</div>
 		</Bounded>
 	);
