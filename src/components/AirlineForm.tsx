@@ -1,29 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FlightDestination } from "@/types/FlightDestination";
-import { submitForm } from "@/app/actions/form-actions";
-import { useRouter, useSearchParams } from "next/navigation";
 import Bounded from "./Bounded";
-import DatePicker from "./ui/date-picker";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import clsx from "clsx";
+import { TripTypeSelector } from "./FormComponents/TripTypeSelector";
+import { DropdownSelector } from "./FormComponents/DropdownSelector";
+import { DateSelector } from "./FormComponents/DateSelector";
+import { submitForm } from "@/app/actions/form-actions";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 
-export interface AirlineFormProps {
+interface AirlineFormProps {
 	destinations: FlightDestination[];
 }
 
 export const AirlineForm = ({ destinations }: AirlineFormProps) => {
-	const router = useRouter();
-	const searchParams = useSearchParams();
-
+	const [loading, setLoading] = useState(false);
+	const [response, setResponse] = useState<string | null>(null);
 	const [tripType, setTripType] = useState("one-way");
 	const [origin, setOrigin] = useState<FlightDestination | null>(null);
 	const [destination, setDestination] = useState<FlightDestination | null>(
@@ -31,47 +24,25 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 	);
 	const [departureDate, setDepartureDate] = useState<Date | undefined>();
 	const [returnDate, setReturnDate] = useState<Date | undefined>();
-	const [loading, setLoading] = useState(false);
-	const [response, setResponse] = useState<string | null>(null);
-
-	const updateQuery = () => {
-		const queryParams = new URLSearchParams();
-		if (origin) queryParams.set("origin", origin.code);
-		if (destination) queryParams.set("destination", destination.code);
-		if (tripType) queryParams.set("type", tripType);
-		if (departureDate)
-			queryParams.set(
-				"departureDate",
-				departureDate.toISOString().split("T")[0]
-			);
-		if (returnDate)
-			queryParams.set("returnDate", returnDate.toISOString().split("T")[0]);
-
-		router.push(`?${queryParams.toString()}`);
-	};
 
 	const handleSubmit = async () => {
-		if (
-			!origin ||
-			!destination ||
-			!departureDate ||
-			(tripType === "round-trip" && !returnDate)
-		) {
-			alert("Please fill in all required fields.");
-			return;
-		}
-
-		const formData = {
-			origin: origin.code,
-			destination: destination.code,
-			type: tripType,
-			departureDate: departureDate.toISOString().split("T")[0],
-			returnDate: returnDate ? returnDate.toISOString().split("T")[0] : null,
-		};
-
 		try {
 			setLoading(true);
-			const result = await submitForm(formData); // Call the server action
+
+			if (!origin || !destination || !departureDate) {
+				throw new Error("Please fill in all required fields.");
+			}
+
+			const formData = {
+				origin: origin.code,
+				destination: destination.code,
+				type: tripType,
+				departureDate: departureDate.toLocaleDateString("en-CA"),
+				returnDate: returnDate ? returnDate.toLocaleDateString("en-CA") : null,
+			};
+
+			const result = await submitForm(formData);
+
 			setResponse(`Success! Booking ID: ${result.bookingId}`);
 		} catch (error) {
 			console.error("Error submitting form:", error);
@@ -81,119 +52,60 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 		}
 	};
 
-	useEffect(() => {
-		const originCode = searchParams.get("origin");
-		const destinationCode = searchParams.get("destination");
-		const type = searchParams.get("type") || "one-way";
-		const departure = searchParams.get("departureDate");
-		const returnD = searchParams.get("returnDate");
-
-		setTripType(type);
-		if (originCode)
-			setOrigin(destinations.find((d) => d.code === originCode) || null);
-		if (destinationCode)
-			setDestination(
-				destinations.find((d) => d.code === destinationCode) || null
-			);
-		if (departure) setDepartureDate(new Date(departure));
-		if (returnD) setReturnDate(new Date(returnD));
-	}, [searchParams, destinations]);
-
-	useEffect(() => {
-		updateQuery();
-	}, [origin, destination, tripType, departureDate, returnDate]);
-
 	return (
 		<Bounded>
 			<div className="flex flex-col gap-10">
 				<h1 className="font-body font-bold text-xl text-center">
-					Welcome to the Digido Airlines!
+					Welcome to Digido Airlines!
 				</h1>
 
-				<div>
-					<Label>Origin</Label>
-					<DropdownMenu>
-						<DropdownMenuTrigger className="border px-4 py-2 rounded w-full text-left">
-							{origin ? origin.city : "Select Origin"}
-						</DropdownMenuTrigger>
-						<DropdownMenuContent>
-							{destinations.map((dest) => (
-								<DropdownMenuItem
-									key={dest.code}
-									onClick={() => setOrigin(dest)}
-								>
-									{dest.city} - {dest.airportName}
-								</DropdownMenuItem>
-							))}
-						</DropdownMenuContent>
-					</DropdownMenu>
-				</div>
+				<DropdownSelector
+					label="Origin"
+					paramKey="origin"
+					selectedOrigin={origin}
+					onChange={setOrigin}
+					options={destinations}
+				/>
 
-				<div>
-					<Label>Destination</Label>
-					<DropdownMenu>
-						<DropdownMenuTrigger className="border px-4 py-2 rounded w-full text-left">
-							{destination ? destination.city : "Select Destination"}
-						</DropdownMenuTrigger>
-						<DropdownMenuContent>
-							{destinations.map((dest) => (
-								<DropdownMenuItem
-									key={dest.code}
-									onClick={() => setDestination(dest)}
-								>
-									{dest.city} - {dest.airportName}
-								</DropdownMenuItem>
-							))}
-						</DropdownMenuContent>
-					</DropdownMenu>
-				</div>
+				<DropdownSelector
+					label="Destination"
+					paramKey="destination"
+					selectedOrigin={destination}
+					onChange={setDestination}
+					options={destinations}
+				/>
 
-				<div>
-					<Label>Trip Type</Label>
-					<RadioGroup
-						value={tripType}
-						onValueChange={(value) => setTripType(value)}
-					>
-						<div className="flex items-center space-x-2">
-							<RadioGroupItem value="one-way" id="one-way" />
-							<Label htmlFor="one-way">One-Way</Label>
-						</div>
-						<div className="flex items-center space-x-2">
-							<RadioGroupItem value="round-trip" id="round-trip" />
-							<Label htmlFor="round-trip">Round-Trip</Label>
-						</div>
-					</RadioGroup>
-				</div>
+				<TripTypeSelector selectedType={tripType} onChange={setTripType} />
 
-				<div>
-					<Label>Departure Date</Label>
-					<DatePicker
-						selectedDate={departureDate}
-						onSelect={(date) => setDepartureDate(date)}
-						availableDays={origin ? origin.availableWeekdays : []}
+				<DateSelector
+					label="Departure Date"
+					paramKey="departureDate"
+					selectedDate={departureDate}
+					onChange={setDepartureDate}
+					availableDays={destinations[0]?.availableWeekdays || []}
+				/>
+
+				<div
+					className={clsx(
+						"transition-all ease-in-out duration-500 overflow-hidden",
+						tripType === "round-trip"
+							? "max-h-40 opacity-100"
+							: "max-h-0 opacity-0"
+					)}
+				>
+					<DateSelector
+						label="Return Date"
+						paramKey="returnDate"
+						selectedDate={returnDate}
+						onChange={setReturnDate}
+						availableDays={destinations[1]?.availableWeekdays || []}
 					/>
 				</div>
-				{tripType === "round-trip" && (
-					<div>
-						<Label>Return Date</Label>
-						<DatePicker
-							selectedDate={returnDate}
-							onSelect={(date) => setReturnDate(date)}
-							availableDays={destination ? destination.availableWeekdays : []}
-						/>
-					</div>
-				)}
 
-				{/* Submit Button */}
-				<button
-					onClick={handleSubmit}
-					className="bg-blue-500 text-white px-4 py-2 rounded"
-					disabled={loading}
-				>
-					{loading ? "Submitting..." : "Submit"}
-				</button>
+				<SubmitButton onClick={handleSubmit} loading={loading}>
+					Submit
+				</SubmitButton>
 
-				{/* Response Message */}
 				{response && <p className="text-center mt-4">{response}</p>}
 			</div>
 		</Bounded>
