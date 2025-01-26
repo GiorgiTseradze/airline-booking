@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FlightDestination } from "@/types/FlightDestination";
+import { submitForm } from "@/app/actions/form-actions";
 import { useRouter, useSearchParams } from "next/navigation";
 import Bounded from "./Bounded";
 import DatePicker from "./ui/date-picker";
@@ -30,8 +31,10 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 	);
 	const [departureDate, setDepartureDate] = useState<Date | undefined>();
 	const [returnDate, setReturnDate] = useState<Date | undefined>();
+	const [loading, setLoading] = useState(false);
+	const [response, setResponse] = useState<string | null>(null);
 
-  const updateQuery = () => {
+	const updateQuery = () => {
 		const queryParams = new URLSearchParams();
 		if (origin) queryParams.set("origin", origin.code);
 		if (destination) queryParams.set("destination", destination.code);
@@ -45,6 +48,37 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 			queryParams.set("returnDate", returnDate.toISOString().split("T")[0]);
 
 		router.push(`?${queryParams.toString()}`);
+	};
+
+	const handleSubmit = async () => {
+		if (
+			!origin ||
+			!destination ||
+			!departureDate ||
+			(tripType === "round-trip" && !returnDate)
+		) {
+			alert("Please fill in all required fields.");
+			return;
+		}
+
+		const formData = {
+			origin: origin.code,
+			destination: destination.code,
+			type: tripType,
+			departureDate: departureDate.toISOString().split("T")[0],
+			returnDate: returnDate ? returnDate.toISOString().split("T")[0] : null,
+		};
+
+		try {
+			setLoading(true);
+			const result = await submitForm(formData); // Call the server action
+			setResponse(`Success! Booking ID: ${result.bookingId}`);
+		} catch (error) {
+			console.error("Error submitting form:", error);
+			setResponse("Error submitting the form. Please try again.");
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	useEffect(() => {
@@ -149,6 +183,18 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 						/>
 					</div>
 				)}
+
+				{/* Submit Button */}
+				<button
+					onClick={handleSubmit}
+					className="bg-blue-500 text-white px-4 py-2 rounded"
+					disabled={loading}
+				>
+					{loading ? "Submitting..." : "Submit"}
+				</button>
+
+				{/* Response Message */}
+				{response && <p className="text-center mt-4">{response}</p>}
 			</div>
 		</Bounded>
 	);
