@@ -14,15 +14,21 @@ import {
 interface DatePickerProps {
 	selectedDate: Date | undefined;
 	onSelect: (date: Date) => void;
-	disabled?: boolean;
+	availableDays: number[];
+}
+
+function getDisabledWeekdays(availableWeekdays: number[]) {
+	const allWeekdays = [0, 1, 2, 3, 4, 5, 6];
+	console.log(availableWeekdays, "wkds");
+	return allWeekdays.filter((day) => !availableWeekdays.includes(day));
 }
 
 export default function DatePicker({
 	selectedDate,
 	onSelect,
-	disabled = false,
+	availableDays = [],
 }: DatePickerProps) {
-	console.log(selectedDate, "date");
+	const disabledDays = { dayOfWeek: getDisabledWeekdays(availableDays) };
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
@@ -45,6 +51,7 @@ export default function DatePicker({
 					mode="single"
 					selected={selectedDate}
 					onSelect={(date) => date && onSelect(date)}
+					disabled={disabledDays}
 					initialFocus
 				/>
 			</PopoverContent>

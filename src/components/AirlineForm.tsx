@@ -100,6 +100,7 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 					<DatePicker
 						selectedDate={departureDate}
 						onSelect={(date) => setDepartureDate(date)}
+						availableDays={origin ? origin.availableWeekdays : []}
 					/>
 				</div>
 				{tripType === "round-trip" && (
@@ -108,7 +109,7 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 						<DatePicker
 							selectedDate={returnDate}
 							onSelect={(date) => setReturnDate(date)}
-							disabled={!departureDate}
+							availableDays={destination ? destination.availableWeekdays : []}
 						/>
 					</div>
 				)}
