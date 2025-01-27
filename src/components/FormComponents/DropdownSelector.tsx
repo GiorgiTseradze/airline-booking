@@ -61,7 +61,7 @@ export const DropdownSelector = ({
 						{selectedOrigin ? selectedOrigin.city : `Select ${label}`}
 					</span>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent className="">
+				<DropdownMenuContent className="w-60">
 					{options.map((option) => (
 						<DropdownMenuItem
 							key={option.code}

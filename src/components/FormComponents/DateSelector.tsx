@@ -49,7 +49,7 @@ export const DateSelector = ({
 	return (
 		<div
 			className={clsx("relative transition-all ease-in-out duration-500", {
-				"pointer-events-none opacity-50": disabled,
+				"pointer-events-none opacity-30": disabled,
 			})}
 		>
 			<Label className="absolute top-0 -translate-y-1/2 left-4 text-xs block p-2 bg-white font-medium text-gray-700 mb-1">
