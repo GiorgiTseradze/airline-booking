@@ -61,6 +61,7 @@ export const DateSelector = ({
 				onChange={handleSelect}
 				availableDays={availableDays}
 				minDate={minDate}
+				paramKey={paramKey}
 			/>
 		</div>
 	);
