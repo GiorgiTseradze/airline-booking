@@ -37,6 +37,19 @@ export const DropdownSelector = ({
 		router.push(`?${params.toString()}`);
 	};
 
+	useEffect(() => {
+		const code = searchParams.get(paramKey);
+		if (code) {
+			const matchedOption = options.find((opt) => opt.code === code);
+			if (
+				matchedOption &&
+				(!selectedOrigin || matchedOption.code !== selectedOrigin.code)
+			) {
+				onChange(matchedOption);
+			}
+		}
+	}, []);
+
 	return (
 		<div className="relative">
 			<Label className="absolute top-0 -translate-y-1/2 left-4 text-xs block p-2 bg-white font-medium text-gray-700 mb-1">
