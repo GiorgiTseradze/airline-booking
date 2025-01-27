@@ -8,19 +8,32 @@ import { useRouter, useSearchParams } from "next/navigation";
 interface TripTypeSelectorProps {
 	selectedType: string;
 	onChange: (value: string) => void;
+	onClearReturnDate?: () => void;
 }
 
 export const TripTypeSelector = ({
 	selectedType,
 	onChange,
+	onClearReturnDate,
 }: TripTypeSelectorProps) => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
 	const handleTripTypeChange = (value: string) => {
 		onChange(value);
+
+		// Update the query parameter
 		const params = new URLSearchParams(searchParams.toString());
 		params.set("type", value);
+
+		// Clear returnDate if switching to one-way
+		if (value === "one-way") {
+			params.delete("returnDate");
+			if (onClearReturnDate) {
+				onClearReturnDate(); // Notify parent to clear state
+			}
+		}
+
 		router.push(`?${params.toString()}`);
 	};
 

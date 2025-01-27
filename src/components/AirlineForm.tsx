@@ -110,7 +110,11 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 					/>
 				</div>
 
-				<TripTypeSelector selectedType={tripType} onChange={setTripType} />
+				<TripTypeSelector
+					selectedType={tripType}
+					onChange={setTripType}
+					onClearReturnDate={() => setReturnDate(undefined)}
+				/>
 
 				<SubmitButton
 					onClick={handleSubmit}
