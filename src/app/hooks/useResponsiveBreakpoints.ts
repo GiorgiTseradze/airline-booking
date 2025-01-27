@@ -3,7 +3,6 @@ import { BREAKPOINTS } from "@/app/utils/breakpoints";
 
 export function useResponsiveBreakpoints() {
 	const [breakpoint, setBreakpoint] = useState({
-		isMd: false,
 		isLg: false,
 		isXl: false,
 	});
@@ -12,7 +11,6 @@ export function useResponsiveBreakpoints() {
 		const updateBreakpoint = () => {
 			const width = window.innerWidth;
 			setBreakpoint({
-				isMd: width >= BREAKPOINTS.md,
 				isLg: width >= BREAKPOINTS.lg,
 				isXl: width >= BREAKPOINTS.xl,
 			});
