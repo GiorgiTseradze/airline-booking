@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { FlightDestination } from "@/types/FlightDestination";
-import { TripTypeSelector } from "./FormComponents/TripTypeSelector";
-import { DropdownSelector } from "./FormComponents/DropdownSelector";
-import { DateSelector } from "./FormComponents/DateSelector";
-import { submitForm } from "@/app/actions/form-actions";
-import { SubmitButton } from "@/components/ui/SubmitButton";
-import Bounded from "@/components/Bounded";
-import { ValidationMessage } from "./ui/ValidationMessage";
 import { useRouter, useSearchParams } from "next/navigation";
+import { submitForm } from "@/app/actions/form-actions";
+import { toast } from "@/hooks/use-toast";
+import { FlightDestination } from "@/types/FlightDestination";
+import { TripTypeSelector } from "@/components/FormComponents/TripTypeSelector";
+import { DropdownSelector } from "@/components/FormComponents/DropdownSelector";
+import { DateSelector } from "@/components/FormComponents/DateSelector";
+import { SubmitButton } from "@/components/ui/SubmitButton";
+import { ValidationMessage } from "@/components/ui/ValidationMessage";
+import { ToastDescription } from "@/components/ui/ToastDescription";
+import Bounded from "@/components/Bounded";
 
 interface AirlineFormProps {
 	destinations: FlightDestination[];
@@ -17,7 +19,6 @@ interface AirlineFormProps {
 
 export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 	const [loading, setLoading] = useState(false);
-	const [response, setResponse] = useState<string | null>(null);
 	const [tripType, setTripType] = useState("roundtrip");
 	const [origin, setOrigin] = useState<FlightDestination | null>(null);
 	const [destination, setDestination] = useState<FlightDestination | null>(
@@ -68,11 +69,31 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 
 			const result = await submitForm(formData);
 
-			setResponse(`Success! Booking ID: ${result.bookingId}`);
+			// Show toast with booking response details
+			toast({
+				title: "Success!",
+				description: (
+					<ToastDescription
+						details={[
+							{ label: "Booking ID", value: result.bookingId },
+							{ label: "Status", value: result.status },
+							{
+								label: "Timestamp",
+								value: new Date(result.timestamp).toLocaleString(),
+							},
+						]}
+					/>
+				),
+				className: "border border-green-500 bg-green-50 max-w-sm mx-auto p-4",
+			});
 			clearForm();
 		} catch (error) {
 			console.error("Error submitting form:", error);
-			setResponse("Error submitting the form. Please try again.");
+			toast({
+				title: "Error",
+				description: "Error submitting the form. Please try again.",
+				variant: "destructive",
+			});
 		} finally {
 			setLoading(false);
 		}
@@ -82,7 +103,7 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 		<Bounded>
 			<div className="relative lg:mt-24 flex flex-col items-center lg:items-start gap-6 lg:gap-10">
 				<div className="relative w-60 lg:w-auto">
-					<div className="flex flex-col gap-4 lg:gap-14 lg:flex-row">
+					<div className="flex flex-col gap-5 lg:gap-14 lg:flex-row">
 						<DropdownSelector
 							label="Origin"
 							paramKey="origin"
@@ -105,7 +126,7 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 					/>
 				</div>
 
-				<div className="flex flex-col gap-4 lg:gap-14 lg:flex-row">
+				<div className="flex flex-col gap-5 lg:gap-14 lg:flex-row">
 					<DateSelector
 						label="From"
 						paramKey="departureDate"
@@ -140,8 +161,6 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 					}
 					message="Book Flight"
 				/>
-
-				{response && <p className="text-center mt-4">{response}</p>}
 			</div>
 		</Bounded>
 	);
