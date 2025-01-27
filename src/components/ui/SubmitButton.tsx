@@ -12,7 +12,7 @@ export const SubmitButton = ({
 	return (
 		<button
 			{...props}
-			className={`bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50 ${
+			className={`bg-blue-500 rounded-3xl text-white px-4 py-2 w-fit disabled:opacity-50 ${
 				props.className || ""
 			}`}
 			disabled={loading || props.disabled}

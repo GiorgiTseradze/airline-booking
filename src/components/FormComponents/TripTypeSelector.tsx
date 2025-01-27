@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -37,15 +37,22 @@ export const TripTypeSelector = ({
 
 	return (
 		<div>
-			<Label>Trip Type</Label>
-			<RadioGroup value={selectedType} onValueChange={handleTripTypeChange}>
+			<RadioGroup
+				className="flex gap-4"
+				value={selectedType}
+				onValueChange={handleTripTypeChange}
+			>
 				<div className="flex items-center space-x-2">
 					<RadioGroupItem value="one-way" id="one-way" />
-					<Label htmlFor="one-way">One-Way</Label>
+					<Label className="hover:text-accent-foreground" htmlFor="one-way">
+						One-Way
+					</Label>
 				</div>
 				<div className="flex items-center space-x-2">
-					<RadioGroupItem value="round-trip" id="round-trip" />
-					<Label htmlFor="round-trip">Round-Trip</Label>
+					<RadioGroupItem value="roundtrip" id="roundtrip" />
+					<Label className="hover:text-accent-foreground" htmlFor="roundtrip">
+						Roundtrip
+					</Label>
 				</div>
 			</RadioGroup>
 		</div>

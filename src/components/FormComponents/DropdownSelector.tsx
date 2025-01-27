@@ -6,9 +6,11 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import { FlightDestination } from "@/types/FlightDestination";
 import { Label } from "@/components/ui/label";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 interface DropdownSelectorProps {
 	label: string;
@@ -36,21 +38,24 @@ export const DropdownSelector = ({
 	};
 
 	return (
-		<div>
-			<Label>{label}</Label>
+		<div className="relative">
+			<Label className="absolute top-0 -translate-y-1/2 left-4 text-xs block p-2 bg-white font-medium text-gray-700 mb-1">
+				{label}
+			</Label>
 			<DropdownMenu>
-				<DropdownMenuTrigger className="border px-4 py-2 rounded w-full text-left">
-					{selectedOrigin
-						? `${selectedOrigin.city} - ${selectedOrigin.airportName}`
-						: `Select ${label}`}
+				<DropdownMenuTrigger className="border-2 hover:bg-accent hover:text-accent-foreground text-gray-900 border-gray-400 text-xl rounded-full p-4 w-60 justify-center text-left bg-white flex items-center shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+					<span className={cn("truncate", !selectedOrigin && "text-gray-500")}>
+						{selectedOrigin ? selectedOrigin.city : `Select ${label}`}
+					</span>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent>
+				<DropdownMenuContent className="">
 					{options.map((option) => (
 						<DropdownMenuItem
 							key={option.code}
 							onClick={() => handleChange(option)}
+							className="px-4 py-2 hover:bg-gray-100 text-lg rounded-lg cursor-pointer"
 						>
-							{option.city} - {option.airportName}
+							{option.city}
 						</DropdownMenuItem>
 					))}
 				</DropdownMenuContent>
