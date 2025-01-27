@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import DatePicker from "@/components/ui/date-picker";
+import clsx from "clsx";
 
 interface DateSelectorProps {
 	label: string;
@@ -11,6 +12,8 @@ interface DateSelectorProps {
 	selectedDate: Date | undefined;
 	onChange: (date: Date | undefined) => void;
 	availableDays: number[];
+	minDate?: Date | undefined;
+	disabled?: boolean;
 }
 
 export const DateSelector = ({
@@ -19,19 +22,17 @@ export const DateSelector = ({
 	selectedDate,
 	onChange,
 	availableDays,
+	minDate = new Date(),
+	disabled = false,
 }: DateSelectorProps) => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
-	const handleSelect = (date: Date | undefined) => {
+	const handleSelect = (date: Date) => {
 		if (!date) return;
 		onChange(date);
 		const params = new URLSearchParams(searchParams.toString());
-		if (date) {
-			params.set(paramKey, date.toLocaleDateString("en-CA"));
-		} else {
-			params.delete(paramKey);
-		}
+		params.set(paramKey, date.toLocaleDateString("en-CA"));
 		router.push(`?${params.toString()}`);
 	};
 
@@ -46,12 +47,20 @@ export const DateSelector = ({
 	}, []);
 
 	return (
-		<div>
-			<Label>{label}</Label>
+		<div
+			className={clsx("relative transition-all ease-in-out duration-500", {
+				"pointer-events-none opacity-50": disabled,
+			})}
+		>
+			<Label className="absolute top-0 -translate-y-1/2 left-4 text-xs block p-2 bg-white font-medium text-gray-700 mb-1">
+				{label}
+			</Label>
+
 			<DatePicker
 				selectedDate={selectedDate}
 				onChange={handleSelect}
 				availableDays={availableDays}
+				minDate={minDate}
 			/>
 		</div>
 	);

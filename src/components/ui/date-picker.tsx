@@ -15,6 +15,7 @@ interface DatePickerProps {
 	selectedDate: Date | undefined;
 	onChange: (date: Date) => void;
 	availableDays: number[];
+	minDate?: Date;
 }
 function getDisabledWeekdays(availableWeekdays: number[]) {
 	const allWeekdays = [0, 1, 2, 3, 4, 5, 6];
@@ -25,8 +26,12 @@ export default function DatePicker({
 	selectedDate,
 	onChange,
 	availableDays = [],
+	minDate,
 }: DatePickerProps) {
-	const disabledDays = { dayOfWeek: getDisabledWeekdays(availableDays) };
+	const disabledDays = [
+		...(minDate ? [{ before: minDate }] : []),
+		{ dayOfWeek: getDisabledWeekdays(availableDays) },
+	];
 
 	return (
 		<Popover>
@@ -45,7 +50,7 @@ export default function DatePicker({
 					</span>
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-auto p-0">
+			<PopoverContent className="w-auto p-0 absolute top-0 right-0">
 				<Calendar
 					mode="single"
 					selected={selectedDate}
