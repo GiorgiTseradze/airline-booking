@@ -51,7 +51,6 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 		params.delete("destination");
 		params.delete("departureDate");
 		params.delete("returnDate");
-		params.delete("type");
 		router.push(`?${params.toString()}`);
 	};
 
