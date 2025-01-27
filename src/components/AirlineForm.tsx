@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { FlightDestination } from "@/types/FlightDestination";
-import clsx from "clsx";
 import { TripTypeSelector } from "./FormComponents/TripTypeSelector";
 import { DropdownSelector } from "./FormComponents/DropdownSelector";
 import { DateSelector } from "./FormComponents/DateSelector";
@@ -10,6 +9,7 @@ import { submitForm } from "@/app/actions/form-actions";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import Bounded from "@/components/Bounded";
 import { ValidationMessage } from "./ui/ValidationMessage";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface AirlineFormProps {
 	destinations: FlightDestination[];
@@ -25,7 +25,10 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 	);
 	const [departureDate, setDepartureDate] = useState<Date | undefined>();
 	const [returnDate, setReturnDate] = useState<Date | undefined>();
+	const router = useRouter();
+	const searchParams = useSearchParams();
 
+	// Central Validation checks
 	const validations = {
 		isSameCity: !!(origin && destination && origin.code === destination.code),
 		isMissingRequiredFields:
@@ -35,25 +38,39 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 			(tripType === "roundtrip" && !returnDate),
 	};
 
+	// Clear forms state and params
+	const clearForm = () => {
+		setOrigin(null);
+		setDestination(null);
+		setDepartureDate(undefined);
+		setReturnDate(undefined);
+		setTripType("roundtrip");
+
+		const params = new URLSearchParams(searchParams.toString());
+		params.delete("origin");
+		params.delete("destination");
+		params.delete("departureDate");
+		params.delete("returnDate");
+		params.delete("type");
+		router.push(`?${params.toString()}`);
+	};
+
 	async function handleSubmit() {
 		try {
 			setLoading(true);
 
-			if (!origin || !destination || !departureDate) {
-				throw new Error("Please fill in all required fields.");
-			}
-
 			const formData = {
-				origin: origin.code,
-				destination: destination.code,
+				origin: origin?.code ?? "",
+				destination: destination?.code ?? "",
 				type: tripType,
-				departureDate: departureDate.toLocaleDateString("en-CA"),
+				departureDate: departureDate?.toLocaleDateString("en-CA") ?? "",
 				returnDate: returnDate ? returnDate.toLocaleDateString("en-CA") : null,
 			};
 
 			const result = await submitForm(formData);
 
 			setResponse(`Success! Booking ID: ${result.bookingId}`);
+			clearForm();
 		} catch (error) {
 			console.error("Error submitting form:", error);
 			setResponse("Error submitting the form. Please try again.");
