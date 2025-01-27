@@ -25,12 +25,12 @@ export const TripTypeSelector = ({
 	};
 
 	useEffect(() => {
-		const type = searchParams.get("type") || "one-way";
+		const type = searchParams.get("type") || selectedType;
 		onChange(type);
 
 		if (!searchParams.get("type")) {
 			const params = new URLSearchParams(searchParams.toString());
-			params.set("type", "one-way");
+			params.set("type", selectedType);
 			router.push(`?${params.toString()}`);
 		}
 	}, []);
@@ -38,20 +38,26 @@ export const TripTypeSelector = ({
 	return (
 		<div>
 			<RadioGroup
-				className="flex gap-4"
+				className="flex gap-4 lg:gap-10"
 				value={selectedType}
 				onValueChange={handleTripTypeChange}
 			>
 				<div className="flex items-center space-x-2">
-					<RadioGroupItem value="one-way" id="one-way" />
-					<Label className="hover:text-accent-foreground" htmlFor="one-way">
-						One-Way
+					<RadioGroupItem value="roundtrip" id="roundtrip" />
+					<Label
+						className="text-xl font-normal hover:text-accent-foreground"
+						htmlFor="roundtrip"
+					>
+						Roundtrip
 					</Label>
 				</div>
 				<div className="flex items-center space-x-2">
-					<RadioGroupItem value="roundtrip" id="roundtrip" />
-					<Label className="hover:text-accent-foreground" htmlFor="roundtrip">
-						Roundtrip
+					<RadioGroupItem value="one-way" id="one-way" />
+					<Label
+						className="text-xl font-normal hover:text-accent-foreground"
+						htmlFor="one-way"
+					>
+						One-Way
 					</Label>
 				</div>
 			</RadioGroup>
