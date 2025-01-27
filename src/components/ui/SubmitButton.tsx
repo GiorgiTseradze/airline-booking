@@ -17,7 +17,8 @@ export const SubmitButton = ({
 		<button
 			{...props}
 			className={clsx(
-				"bg-blue-500 rounded-3xl text-white px-4 py-2 w-fit transition-opacity",
+				"bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 w-fit rounded-3xl transition-opacity",
+				"focus:outline-none focus:ring focus:ring-blue-300 focus:ring-offset-2",
 				disabled || loading ? "opacity-50 pointer-events-none" : "opacity-100",
 				props.className
 			)}
