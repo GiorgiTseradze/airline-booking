@@ -7,62 +7,67 @@ import DatePicker from "@/components/ui/date-picker";
 import clsx from "clsx";
 
 interface DateSelectorProps {
-	label: string;
-	paramKey: "departureDate" | "returnDate";
-	selectedDate: Date | undefined;
-	onChange: (date: Date | undefined) => void;
-	availableDays: number[];
-	minDate?: Date | undefined;
-	disabled?: boolean;
+  label: string;
+  paramKey: "departureDate" | "returnDate";
+  selectedDate: Date | undefined;
+  onChange: (date: Date | undefined) => void;
+  availableDays: number[];
+  minDate?: Date | undefined;
+  disabled?: boolean;
 }
 
 export const DateSelector = ({
-	label,
-	paramKey,
-	selectedDate,
-	onChange,
-	availableDays,
-	minDate = new Date(),
-	disabled = false,
+  label,
+  paramKey,
+  selectedDate,
+  onChange,
+  availableDays,
+  minDate = new Date(),
+  disabled = false,
 }: DateSelectorProps) => {
-	const router = useRouter();
-	const searchParams = useSearchParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-	const handleSelect = (date: Date) => {
-		if (!date) return;
-		onChange(date);
-		const params = new URLSearchParams(searchParams.toString());
-		params.set(paramKey, date.toLocaleDateString("en-CA"));
-		router.push(`?${params.toString()}`);
-	};
+  const handleSelect = (date: Date) => {
+    if (!date) return;
+    onChange(date);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(paramKey, date.toLocaleDateString("en-CA"));
+    router.push(`?${params.toString()}`);
+  };
 
-	useEffect(() => {
-		const dateParam = searchParams.get(paramKey);
-		if (dateParam) {
-			const parsedDate = new Date(dateParam);
-			if (!isNaN(parsedDate.getTime())) {
-				onChange(parsedDate);
-			}
-		}
-	}, []);
+  // This effect initializes the date value from the URL params if available
+  useEffect(() => {
+    const dateParam = searchParams.get(paramKey);
+    if (dateParam) {
+      const parsedDate = new Date(dateParam);
+      if (!isNaN(parsedDate.getTime())) {
+        onChange(parsedDate);
+      } else {
+        console.warn(
+          `Invalid date in URL params for ${paramKey}: ${dateParam}`
+        );
+      }
+    }
+  }, []);
 
-	return (
-		<div
-			className={clsx("relative transition-all ease-in-out duration-500", {
-				"pointer-events-none opacity-30": disabled,
-			})}
-		>
-			<Label className="absolute top-0 -translate-y-1/2 left-4 text-xs block p-2 bg-white font-medium text-gray-700 mb-1">
-				{label}
-			</Label>
+  return (
+    <div
+      className={clsx("relative transition-all ease-in-out duration-500", {
+        "pointer-events-none opacity-30": disabled,
+      })}
+    >
+      <Label className="absolute top-0 -translate-y-1/2 left-4 text-xs block p-2 bg-white font-medium text-gray-700 mb-1">
+        {label}
+      </Label>
 
-			<DatePicker
-				selectedDate={selectedDate}
-				onChange={handleSelect}
-				availableDays={availableDays}
-				minDate={minDate}
-				paramKey={paramKey}
-			/>
-		</div>
-	);
+      <DatePicker
+        selectedDate={selectedDate}
+        onChange={handleSelect}
+        availableDays={availableDays}
+        minDate={minDate}
+        paramKey={paramKey}
+      />
+    </div>
+  );
 };
