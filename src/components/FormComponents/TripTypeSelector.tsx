@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useRouter, useSearchParams } from "next/navigation";
 
 interface TripTypeSelectorProps {
 	selectedType: string;
@@ -22,15 +23,19 @@ export const TripTypeSelector = ({
 	const handleTripTypeChange = (value: string) => {
 		onChange(value);
 
-		// Update the query parameter
 		const params = new URLSearchParams(searchParams.toString());
 		params.set("type", value);
 
 		// Clear returnDate if switching to one-way
-		if (value === "one-way") {
+		if (value === "one-way" && params.has("returnDate")) {
 			params.delete("returnDate");
 			if (onClearReturnDate) {
-				onClearReturnDate(); // Notify parent to clear state
+				toast({
+					title: "Reset Return Date",
+					description:
+						"The return date has been reset because the trip is one-way.",
+				});
+				onClearReturnDate();
 			}
 		}
 
