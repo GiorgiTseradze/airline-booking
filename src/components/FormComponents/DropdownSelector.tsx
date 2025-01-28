@@ -43,14 +43,14 @@ export const DropdownSelector = ({
       toast({
         title: "Reset Departure Date",
         description:
-        "The departure date has been reset because it is not available for the selected origin."
+          "The departure date has been reset because it is not available for the selected origin.",
       });
     } else if (key === "destination" && params.has("returnDate")) {
       params.delete("returnDate");
       toast({
         title: "Reset Return Date",
         description:
-        "The return date has been reset because it is not available for the selected destination."
+          "The return date has been reset because it is not available for the selected destination.",
       });
     }
   };
@@ -89,7 +89,7 @@ export const DropdownSelector = ({
         <DropdownMenuTrigger
           id={`${paramKey}-dropdown`}
           aria-label={`Select ${label}`}
-          className="border-2 text-gray-900 border-gray-400 text-xl rounded-full p-4 w-60 justify-center text-left bg-white flex items-center active:ring-2 active:ring-blue-700 shadow-sm focus:outline-none transition-all ease-in-out duration-150 focus:ring-2 focus:ring-blue-600 hover:ring-2 hover:ring-blue-500 hover:bg-transparent"
+          className="border-2 text-gray-900 border-gray-400 text-xl rounded-full p-4 w-60 justify-center text-left bg-white flex items-center active:border-blue-700 shadow-sm outline-none transition-all ease-in-out duration-150 focus:border-blue-600 hover:border-blue-500"
         >
           <span className={cn("truncate", !selectedOrigin && "text-gray-500")}>
             {selectedOrigin ? selectedOrigin.city : `Select ${label}`}
