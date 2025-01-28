@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { submitForm } from "@/app/actions/form-actions";
 import { toast } from "@/hooks/use-toast";
@@ -30,14 +30,35 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 	const [returnDate, setReturnDate] = useState<Date | undefined>();
 
 	// Central Validation checks
-	const validations = {
+	const validations = useMemo(() => ({
 		isSameCity: !!(origin && destination && origin.code === destination.code),
 		isMissingRequiredFields:
 			!origin ||
 			!destination ||
 			!departureDate ||
 			(tripType === "roundtrip" && !returnDate),
+	}), [origin, destination, departureDate, returnDate, tripType]);
+
+	// Function to safely set the origin and validate the departure date
+	const handleOriginChange = (value: FlightDestination | null) => {
+		setOrigin(value);
+
+		// If the current departure date is not available in the new origin's weekdays, reset it
+		if (departureDate && value && !value.availableWeekdays.includes(departureDate.getDay())) {
+			setDepartureDate(undefined);
+		}
 	};
+
+	// Function to set the destination and validate the return date
+	const handleDestinationChange = (value: FlightDestination | null) => {
+		setDestination(value);
+
+		// If the current return date is not available in the new destination's weekdays, reset it
+		if (returnDate && value && !value.availableWeekdays.includes(returnDate.getDay())) {
+			setReturnDate(undefined);
+		}
+	};
+	
 
 	// Clear forms state and params
 	const clearForm = () => {
@@ -48,10 +69,11 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 		setTripType("roundtrip");
 
 		const params = new URLSearchParams(searchParams.toString());
-		params.delete("origin");
-		params.delete("destination");
-		params.delete("departureDate");
-		params.delete("returnDate");
+		
+	  ["origin", "destination", "departureDate", "returnDate"].forEach((key) =>
+			params.delete(key)
+		);
+
 		router.push(`?${params.toString()}`);
 	};
 
@@ -108,10 +130,7 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 							label="Origin"
 							paramKey="origin"
 							selectedOrigin={origin}
-							onChange={(value) => {
-								setOrigin(value);
-								setDepartureDate(undefined);
-							}}
+							onChange={handleOriginChange}
 							options={destinations}
 						/>
 
@@ -119,16 +138,14 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 							label="Destination"
 							paramKey="destination"
 							selectedOrigin={destination}
-							onChange={(value) => {
-								setDestination(value);
-								setReturnDate(undefined);
-							}}
+							onChange={handleDestinationChange}
 							options={destinations}
 						/>
 					</div>
 					<ValidationMessage
 						isInvalid={validations.isSameCity}
 						message="Origin and destination cannot be the same."
+						aria-live="polite"
 					/>
 				</div>
 
@@ -166,6 +183,7 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 						validations.isSameCity || validations.isMissingRequiredFields
 					}
 					message="Book Flight"
+					aria-live="polite"
 				/>
 			</div>
 		</Bounded>

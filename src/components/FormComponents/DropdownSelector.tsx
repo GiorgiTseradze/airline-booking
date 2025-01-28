@@ -43,14 +43,14 @@ export const DropdownSelector = ({
       toast({
         title: "Reset Departure Date",
         description:
-          "The departure date has been reset because the origin changed.",
+        "The departure date has been reset because it is not available for the selected origin."
       });
     } else if (key === "destination" && params.has("returnDate")) {
       params.delete("returnDate");
       toast({
         title: "Reset Return Date",
         description:
-          "The return date has been reset because the destination changed.",
+        "The return date has been reset because it is not available for the selected destination."
       });
     }
   };
