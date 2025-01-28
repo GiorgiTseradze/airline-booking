@@ -62,7 +62,7 @@ export default function DatePicker({
             paramKey === "departureDate" ? "departure" : "return"
           } date`}
           className={cn(
-            "transition-all ease-in-out duration-150 hover:border-blue-500 hover:bg-transparent active:border-blue-700 text-gray-900 text-xl h-auto rounded-full p-4 w-60 text-left bg-white flex items-center shadow-sm outline-none focus:border-blue-600 justify-center font-normal",
+            "border-2 border-gray-400 transition-all ease-in-out duration-150 hover:border-blue-500 hover:bg-transparent active:border-blue-700 text-gray-900 text-xl h-auto rounded-full p-4 w-60 text-left bg-white flex items-center shadow-sm outline-none focus:border-blue-600 justify-center font-normal",
             !selectedDate && "text-muted-foreground"
           )}
         >
