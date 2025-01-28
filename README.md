@@ -4,7 +4,7 @@ Airline Booking is a responsive web application that allows users to search for 
 
 ## 🚀 Live Demo
 
-[Airline Booking](https://airline-booking-six.vercel.app/)
+[Airline Booking](https://digido-airline-booking.vercel.app/)
 
 ---
 
