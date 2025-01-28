@@ -18,6 +18,8 @@ interface AirlineFormProps {
 }
 
 export const AirlineForm = ({ destinations }: AirlineFormProps) => {
+	const router = useRouter();
+	const searchParams = useSearchParams();
 	const [loading, setLoading] = useState(false);
 	const [tripType, setTripType] = useState("roundtrip");
 	const [origin, setOrigin] = useState<FlightDestination | null>(null);
@@ -26,8 +28,6 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 	);
 	const [departureDate, setDepartureDate] = useState<Date | undefined>();
 	const [returnDate, setReturnDate] = useState<Date | undefined>();
-	const router = useRouter();
-	const searchParams = useSearchParams();
 
 	// Central Validation checks
 	const validations = {
@@ -108,7 +108,10 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 							label="Origin"
 							paramKey="origin"
 							selectedOrigin={origin}
-							onChange={setOrigin}
+							onChange={(value) => {
+								setOrigin(value);
+								setDepartureDate(undefined);
+							}}
 							options={destinations}
 						/>
 
@@ -116,7 +119,10 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 							label="Destination"
 							paramKey="destination"
 							selectedOrigin={destination}
-							onChange={setDestination}
+							onChange={(value) => {
+								setDestination(value);
+								setReturnDate(undefined);
+							}}
 							options={destinations}
 						/>
 					</div>

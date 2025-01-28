@@ -1,16 +1,17 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { FlightDestination } from "@/types/FlightDestination";
+import { Label } from "@/components/ui/label";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import { FlightDestination } from "@/types/FlightDestination";
-import { Label } from "@/components/ui/label";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 
 interface DropdownSelectorProps {
 	label: string;
@@ -30,9 +31,32 @@ export const DropdownSelector = ({
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
+	// Helper function to handle resetting dependent params
+	const resetDependentParams = (
+		params: URLSearchParams,
+		key: "origin" | "destination"
+	) => {
+		if (key === "origin" && params.has("departureDate")) {
+			params.delete("departureDate");
+			toast({
+				title: "Reset Departure Date",
+				description:
+					"The departure date has been reset because the origin changed.",
+			});
+		} else if (key === "destination" && params.has("returnDate")) {
+			params.delete("returnDate");
+			toast({
+				title: "Reset Return Date",
+				description:
+					"The return date has been reset because the destination changed.",
+			});
+		}
+	};
+
 	const handleChange = (value: FlightDestination) => {
 		onChange(value);
 		const params = new URLSearchParams(searchParams.toString());
+		resetDependentParams(params, paramKey);
 		params.set(paramKey, value.code);
 		router.push(`?${params.toString()}`);
 	};
@@ -56,7 +80,10 @@ export const DropdownSelector = ({
 				{label}
 			</Label>
 			<DropdownMenu>
-				<DropdownMenuTrigger className="border-2 hover:bg-accent hover:text-accent-foreground text-gray-900 border-gray-400 text-xl rounded-full p-4 w-60 justify-center text-left bg-white flex items-center shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+				<DropdownMenuTrigger
+					aria-label={`Select ${label}`}
+					className="border-2 hover:bg-accent hover:text-accent-foreground text-gray-900 border-gray-400 text-xl rounded-full p-4 w-60 justify-center text-left bg-white flex items-center shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+				>
 					<span className={cn("truncate", !selectedOrigin && "text-gray-500")}>
 						{selectedOrigin ? selectedOrigin.city : `Select ${label}`}
 					</span>
