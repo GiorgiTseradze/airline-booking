@@ -39,27 +39,6 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 			(tripType === "roundtrip" && !returnDate),
 	}), [origin, destination, departureDate, returnDate, tripType]);
 
-	// Function to safely set the origin and validate the departure date
-	const handleOriginChange = (value: FlightDestination | null) => {
-		setOrigin(value);
-
-		// If the current departure date is not available in the new origin's weekdays, reset it
-		if (departureDate && value && !value.availableWeekdays.includes(departureDate.getDay())) {
-			setDepartureDate(undefined);
-		}
-	};
-
-	// Function to set the destination and validate the return date
-	const handleDestinationChange = (value: FlightDestination | null) => {
-		setDestination(value);
-
-		// If the current return date is not available in the new destination's weekdays, reset it
-		if (returnDate && value && !value.availableWeekdays.includes(returnDate.getDay())) {
-			setReturnDate(undefined);
-		}
-	};
-	
-
 	// Clear forms state and params
 	const clearForm = () => {
 		setOrigin(null);
@@ -130,7 +109,10 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 							label="Origin"
 							paramKey="origin"
 							selectedOrigin={origin}
-							onChange={handleOriginChange}
+							onChange={(value) => {
+								setOrigin(value);
+								setDepartureDate(undefined);
+							}}
 							options={destinations}
 						/>
 
@@ -138,7 +120,10 @@ export const AirlineForm = ({ destinations }: AirlineFormProps) => {
 							label="Destination"
 							paramKey="destination"
 							selectedOrigin={destination}
-							onChange={handleDestinationChange}
+							onChange={(value) => {
+								setDestination(value);
+								setReturnDate(undefined);
+							}}
 							options={destinations}
 						/>
 					</div>
