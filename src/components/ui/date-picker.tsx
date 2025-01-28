@@ -55,7 +55,7 @@ export default function DatePicker({
 				<Button
 					variant={"outline"}
 					className={cn(
-						"border-2 text-gray-900 border-gray-400 text-xl h-auto rounded-full p-4 w-60 text-left bg-white flex items-center shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 justify-center font-normal",
+						"transition-all ease-in-out duration-150 hover:ring-2 hover:ring-blue-500 hover:bg-transparent active:ring-2 active:ring-blue-700 active:bg-gray-100 border-2 text-gray-900 border-gray-400 text-xl h-auto rounded-full p-4 w-60 text-left bg-white flex items-center shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 justify-center font-normal",
 						!selectedDate && "text-muted-foreground"
 					)}
 				>

@@ -82,7 +82,7 @@ export const DropdownSelector = ({
 			<DropdownMenu>
 				<DropdownMenuTrigger
 					aria-label={`Select ${label}`}
-					className="border-2 text-gray-900 border-gray-400 text-xl rounded-full p-4 w-60 justify-center text-left bg-white flex items-center shadow-sm focus:outline-none transition-all ease-in-out duration-150 focus:ring-2 focus:ring-blue-500 hover:ring-2 hover:ring-blue-500 hover:bg-transparent"
+					className="border-2 text-gray-900 border-gray-400 text-xl rounded-full p-4 w-60 justify-center text-left bg-white flex items-center active:ring-2 active:ring-blue-700 shadow-sm focus:outline-none transition-all ease-in-out duration-150 focus:ring-2 focus:ring-blue-600 hover:ring-2 hover:ring-blue-500 hover:bg-transparent"
 				>
 					<span className={cn("truncate", !selectedOrigin && "text-gray-500")}>
 						{selectedOrigin ? selectedOrigin.city : `Select ${label}`}
